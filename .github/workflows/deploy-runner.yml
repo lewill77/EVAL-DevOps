@@ -16,31 +16,15 @@ jobs:
 
       - name: Installation nginx
         run: |
-          sudo apt update
-          sudo apt install -y nginx
-          sudo mkdir -p /var/www/site
-          sudo chown -R www-data:www-data /var/www/site
+          choco install nginx -y
+        shell: powershell
 
-      - name: Configuration nginx
+      - name: Déploiement du site
         run: |
-          sudo tee /etc/nginx/sites-available/site > /dev/null <<EOF
-          server {
-            listen 80;
-            server_name _;
-            root /var/www/site;
-            index index.html;
-            location / {
-              try_files \$uri \$uri/ =404;
-            }
-          }
-          EOF
-          sudo ln -sf /etc/nginx/sites-available/site /etc/nginx/sites-enabled/site
-          sudo rm -f /etc/nginx/sites-enabled/default
-          sudo cp index.html /var/www/site/index.html
-          sudo chown www-data:www-data /var/www/site/index.html
-          sudo nginx -t
+          Copy-Item index.html "C:\tools\nginx\html\index.html" -Force
+        shell: powershell
 
-      - name: Redémarrage nginx
+      - name: Démarrage nginx
         run: |
-          sudo systemctl enable nginx
-          sudo systemctl restart nginx
+          Start-Process "C:\tools\nginx\nginx.exe"
+        shell: powershell
